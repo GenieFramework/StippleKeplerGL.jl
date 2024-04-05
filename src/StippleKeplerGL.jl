@@ -6,13 +6,13 @@ using CSV
 using Colors
 using ColorBrewer
 
-df = CSV.read("../packages/KeplerGL/V6OzT/assets/example_data/data.csv", DataFrame)
+df = CSV.read(joinpath(Base.pkgdir(KeplerGL), "assets", "example_data", "data.csv"), DataFrame)
 
-token = "token please"   
+token = "token please"
 
 m = KeplerGL.KeplerGLMap(token, center_map=false)
 KeplerGL.add_point_layer!(m, df, :Latitude, :Longitude,
-    color = colorant"rgb(23,184,190)", color_field = :Magnitude, color_scale = "quantize", 
+    color = colorant"rgb(23,184,190)", color_field = :Magnitude, color_scale = "quantize",
     color_range = ColorBrewer.palette("PRGn", 6),
     radius_field = :Magnitude, radius_scale = "sqrt", radius_range = [4.2, 96.2], radius_fixed = false,
     filled = true, opacity = 0.39, outline = false);
@@ -32,8 +32,6 @@ end
 keplergl_assets_config = Genie.Assets.AssetsConfig(package = "KeplerGL.jl")
 assets_config = Genie.Assets.AssetsConfig(package = "StippleKeplerGL.jl")
 
-basedir = dirname(dirname(pathof(KeplerGL)))
-
 deps_routes = String[]
 for js in [
     "react.production.min.js", "react-dom.production.min.js",
@@ -44,7 +42,7 @@ for js in [
   push!(deps_routes, s)
 end
 
-basedir = "C:/Users/helmu/.julia/dev/StippleKeplerGL"
+basedir = joinpath(Base.homedir(), ".julia", "dev", "StippleKeplerGL")
 s = script(src = Genie.Assets.add_fileroute(assets_config, "KeplerGL.js"; basedir).path)
 push!(deps_routes, s)
 
