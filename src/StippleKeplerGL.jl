@@ -32,6 +32,7 @@ end
 keplergl_assets_config = Genie.Assets.AssetsConfig(package = "KeplerGL.jl")
 assets_config = Genie.Assets.AssetsConfig(package = "StippleKeplerGL.jl")
 
+basedir = Base.pkgdir(KeplerGL)
 deps_routes = String[]
 for js in [
     "react.production.min.js", "react-dom.production.min.js",
