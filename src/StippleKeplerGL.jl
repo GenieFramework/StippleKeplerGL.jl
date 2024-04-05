@@ -1,66 +1,47 @@
-using Stipple, Stipple.ReactiveTools
-using StippleUI
-using KeplerGL
-using DataFrames
-using CSV
-using Colors
-using ColorBrewer
+module StippleKeplerGL
 
-df = CSV.read("../packages/KeplerGL/V6OzT/assets/example_data/data.csv", DataFrame)
+using Stipple
+using Reexport
 
-token = "token please"   
+@reexport using KeplerGL
 
-m = KeplerGL.KeplerGLMap(token, center_map=false)
-KeplerGL.add_point_layer!(m, df, :Latitude, :Longitude,
-    color = colorant"rgb(23,184,190)", color_field = :Magnitude, color_scale = "quantize", 
-    color_range = ColorBrewer.palette("PRGn", 6),
-    radius_field = :Magnitude, radius_scale = "sqrt", radius_range = [4.2, 96.2], radius_fixed = false,
-    filled = true, opacity = 0.39, outline = false);
-
-m.config[:config][:mapState][:latitude] = 38.32068477880718
-m.config[:config][:mapState][:longitude]= -120.42806781055732
-m.config[:config][:mapState][:zoom] = 4.886825331541375
-m.window[:map_legend_show] = false
-m.window[:map_legend_active] = false
-m.window[:visible_layers_show] = false
-m.window[:visible_layers_active] = false
-
-@app HH begin
-    @out map = m
-end
+export keplergl
 
 keplergl_assets_config = Genie.Assets.AssetsConfig(package = "KeplerGL.jl")
 assets_config = Genie.Assets.AssetsConfig(package = "StippleKeplerGL.jl")
 
-basedir = dirname(dirname(pathof(KeplerGL)))
+const deps_routes = String[]
+deps() = deps_routes
 
-deps_routes = String[]
-for js in [
-    "react.production.min.js", "react-dom.production.min.js",
-    "redux.js", "react-redux.min.js",
-    "styled-components.min.js", "keplergl.min.js",
-  ]
-  s = script(src = Genie.Assets.add_fileroute(keplergl_assets_config, js; basedir).path)
-  push!(deps_routes, s)
+import Stipple.Genie.Renderer.Html: register_normal_element, normal_element
+
+register_normal_element("kepler__gl", context = @__MODULE__)
+
+function keplergl(map::Union{Symbol,Nothing}, args...;
+    col::Union{Int,AbstractString,Symbol,Nothing} = -1,
+    xs::Union{Int,AbstractString,Symbol,Nothing} = -1, sm::Union{Int,AbstractString,Symbol,Nothing} = -1, md::Union{Int,AbstractString,Symbol,Nothing} = -1,
+    lg::Union{Int,AbstractString,Symbol,Nothing} = -1, xl::Union{Int,AbstractString,Symbol,Nothing} = -1, size::Union{Int,AbstractString,Symbol,Nothing} = -1,
+    class = "", kwargs...)
+    
+    kwargs = Stipple.attributes(Stipple.flexgrid_kwargs(; map, class, col, xs, sm, md, lg, xl, symbol_class = false, kwargs...))
+  
+    kepler__gl(args...; kwargs...)
 end
 
-basedir = "C:/Users/helmu/.julia/dev/StippleKeplerGL"
-s = script(src = Genie.Assets.add_fileroute(assets_config, "KeplerGL.js"; basedir).path)
-push!(deps_routes, s)
+function __init__()
+    basedir = dirname(dirname(pathof(KeplerGL)))
+    for js in [
+        "react.production.min.js", "react-dom.production.min.js",
+        "redux.js", "react-redux.min.js",
+        "styled-components.min.js", "keplergl.min.js",
+    ]
+        s = script(src = Genie.Assets.add_fileroute(keplergl_assets_config, js; basedir).path)
+        push!(deps_routes, s)
+    end
 
-kepler_deps() = deps_routes
-
-@deps HH kepler_deps
-
-ui() = [
-    h1("Hello World")
-    xelem(R"kepler-gl", map = :map)
-]
-
-route("/") do
-    global model
-    model = @init HH
-    page(model, ui) |> html
+    basedir = dirname(@__DIR__)
+    s = script(src = Genie.Assets.add_fileroute(assets_config, "KeplerGL.js"; basedir).path)
+    push!(deps_routes, s)
 end
 
-up(open_browser = true)
+end

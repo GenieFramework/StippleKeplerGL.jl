@@ -1,0 +1,9 @@
+name = "StippleKeplerGL"
+uuid = "2b41e42f-53d9-436c-aed0-ebb7c31b58f1"
+authors = ["Helmut Hänsel <helmut.haensel@gmx.de>"]
+version = "0.1.0"
+
+[deps]
+KeplerGL = "389c4311-7670-4ca7-a1b4-f34bb8a2527a"
+Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
+Stipple = "4acbeb90-81a0-11ea-1966-bdaff8155998"

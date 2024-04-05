@@ -135,16 +135,15 @@ Vue.component("KeplerGl", {
                 }
 
                 // for debugging
-                // console.log(processeddata)
 
                 // match id with old datasets
-                newDataset = processeddata.map((d, i) => ({
+                newDataset = processeddata.map((d2, i) => ({
                 version: m.config.version,
                 data: {
                     id: d.id,
                     label: d.id,
-                    allData: d.rows,
-                    fields: d.fields
+                    allData: d2.rows,
+                    fields: d2.fields
                 }
                 }));
 
