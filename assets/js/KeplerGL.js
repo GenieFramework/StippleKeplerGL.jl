@@ -1,4 +1,4 @@
-Vue.component("KeplerGl", {
+Vue.component("VueKeplerGl", {
     template: '<div id="id1"></div>',
     inheritAttrs: !1,
     props: {

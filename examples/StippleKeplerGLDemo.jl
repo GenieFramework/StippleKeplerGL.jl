@@ -5,7 +5,7 @@ using CSV
 using Colors
 using ColorBrewer
 
-keplergl_path = dirname(dirname(pathof(KeplerGL)))
+keplergl_path = dirname(dirname(pathof(isdefined(@__MODULE__, :KeplerGLBase) ? KeplerGLBase : KeplerGL)))
 df = CSV.read("$keplergl_path/assets/example_data/data.csv", DataFrame)
 
 token = "token please"   
@@ -29,10 +29,11 @@ m.window[:map_legend_show] = m.window[:map_legend_active] = m.window[:visible_la
 end
 
 @deps StippleKeplerGL
+Stipple.register_global_components("VueKeplerGl", legacy = true)
 
 ui() = [
     h1("KeplerGL Demo", style = "padding-bottom: 0.5em")
-    keplergl(:map)
+    keplergl(:map, ref = "map")
 ]
 
 @page("/", ui)

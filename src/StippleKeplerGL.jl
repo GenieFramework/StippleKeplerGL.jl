@@ -7,7 +7,7 @@ using Reexport
 
 export keplergl
 
-keplergl_assets_config = Genie.Assets.AssetsConfig(package = "KeplerGL.jl")
+keplergl_assets_config = Genie.Assets.AssetsConfig(package = "KeplerGLBase.jl")
 assets_config = Genie.Assets.AssetsConfig(package = "StippleKeplerGL.jl")
 
 const deps_routes = String[]
@@ -15,7 +15,7 @@ deps() = deps_routes
 
 import Stipple.Genie.Renderer.Html: register_normal_element, normal_element
 
-register_normal_element("kepler__gl", context = @__MODULE__)
+register_normal_element("vue__kepler__gl", context = @__MODULE__)
 
 function keplergl(map::Union{Symbol,Nothing}, args...;
     col::Union{Int,AbstractString,Symbol,Nothing} = -1,
@@ -25,11 +25,11 @@ function keplergl(map::Union{Symbol,Nothing}, args...;
     
     kwargs = Stipple.attributes(Stipple.flexgrid_kwargs(; map, class, col, xs, sm, md, lg, xl, symbol_class = false, kwargs...))
   
-    kepler__gl(args...; kwargs...)
+    vue__kepler__gl(args...; kwargs...)
 end
 
 function __init__()
-    basedir = dirname(dirname(pathof(KeplerGL)))
+    basedir = dirname(dirname(pathof(KeplerGLBase)))
     for js in [
         "react.production.min.js", "react-dom.production.min.js",
         "redux.js", "react-redux.min.js",
