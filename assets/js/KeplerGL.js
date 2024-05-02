@@ -101,17 +101,24 @@ Vue.component("VueKeplerGl", {
             const KeplerElement = (function (react, KeplerGl, mapboxToken) {
                 return function(props) {
                     return react.createElement(
-                    'div',
-                    {style: {position: 'relative', left: 0, width: '100%', height: '100%'}},
-                    react.createElement(
-                        KeplerGl.KeplerGl,
-                        {
-                            mapboxApiAccessToken: mapboxToken,
-                            id: this.id,
-                            width: props.width || m.window.width,
-                            height: props.height || m.window.height
-                        }
-                    )
+                        'div',
+                        {style: {position: 'relative', left: 0, width: '100%', height: '100%'}},
+                        react.createElement(
+                            AutoSizer,
+                            {},
+                            function({height, width}) {
+                                console.log('height: ' + height + ' width: ' + width)
+                                return react.createElement(
+                                    KeplerGl.KeplerGl,
+                                    {
+                                        mapboxApiAccessToken: mapboxToken,
+                                        id: this.id,
+                                        width: width,
+                                        height: height
+                                    }
+                                )
+                            }
+                        )
                     )
                 }
             }(React, KeplerGl, MAPBOX_TOKEN));

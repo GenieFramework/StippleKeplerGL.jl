@@ -40,8 +40,10 @@ function __init__()
     end
 
     basedir = dirname(@__DIR__)
-    s = script(src = Genie.Assets.add_fileroute(assets_config, "KeplerGL.js"; basedir).path)
-    push!(deps_routes, s)
+    for js in ["KeplerGL.js", "react-virtualized-autosizer.min.js"]
+        s = script(src = Genie.Assets.add_fileroute(assets_config, js; basedir).path)
+        push!(deps_routes, s)
+    end
 end
 
 end

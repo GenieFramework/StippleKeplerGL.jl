@@ -33,7 +33,7 @@ end
 
 ui() = [
     h1("KeplerGL Demo", style = "padding-bottom: 0.5em")
-    keplergl(:map, ref = "map")
+    keplergl(:map, ref = "map", style = "height: 400px;")
 ]
 
 @page("/", ui)
