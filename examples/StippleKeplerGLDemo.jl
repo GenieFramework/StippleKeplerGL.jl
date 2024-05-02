@@ -29,7 +29,7 @@ m.window[:map_legend_show] = m.window[:map_legend_active] = m.window[:visible_la
 end
 
 @deps StippleKeplerGL
-Stipple.register_global_components("VueKeplerGl", legacy = true)
+# Stipple.register_global_components("VueKeplerGl", legacy = true)
 
 ui() = [
     h1("KeplerGL Demo", style = "padding-bottom: 0.5em")

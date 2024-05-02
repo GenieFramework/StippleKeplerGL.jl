@@ -13,11 +13,21 @@ Vue.component("VueKeplerGl", {
     },
     data() {
         return {
-            
+            app: null,
+            store: null
         }
     },
     mounted() {
-        this.replot(this.map)
+        let d = this.setup_map(this.map)
+        this.app = d.app
+        this.store = d.store
+        this.load_data(this.map.datasets)
+    },
+    watch: {
+        'map.datasets': {
+            handler: function (m) {this.load_data(m)},
+            deep: true
+        }
     },
     methods: {
         make_initial_state(m) {
@@ -47,7 +57,7 @@ Vue.component("VueKeplerGl", {
                 }
             })
         },
-        replot(m) {
+        setup_map(m) {
             /* Validate Mapbox Token */
             MAPBOX_TOKEN = m.window.token
             console.log(MAPBOX_TOKEN)
@@ -58,20 +68,20 @@ Vue.component("VueKeplerGl", {
             /** STORE **/
             state = this.make_initial_state(m)
             const reducers = (function createReducers(Redux, KeplerGl) {
-            return Redux.combineReducers({
-                // mount KeplerGl reducer
-                keplerGl: state
-            });
+                return Redux.combineReducers({
+                    // mount KeplerGl reducer
+                    keplerGl: state
+                });
             }(Redux, KeplerGl));
 
             const middleWares = (function createMiddlewares(KeplerGl) {
-            return KeplerGl.enhanceReduxMiddleware([
-                // Add other middlewares here
-            ]);
+                return KeplerGl.enhanceReduxMiddleware([
+                    // Add other middlewares here
+                ]);
             }(KeplerGl));
 
             const enhancers = (function createEnhancers(Redux, middles) {
-            return Redux.applyMiddleware(...middles);
+                return Redux.applyMiddleware(...middles);
             }(Redux, middleWares));
 
             const store = (function createStore(Redux, enhancers) {
@@ -117,15 +127,18 @@ Vue.component("VueKeplerGl", {
 
             /** Render **/
             (function render(react, ReactDOM, app) {
-            ReactDOM.render(app, document.getElementById('id1'));
+                ReactDOM.render(app, document.getElementById('id1'));
             }(React, ReactDOM, app));
 
+            return {app, store}
+        },
+        load_data(datasets) {
             const newDatasets = [];
-            m.datasets.forEach( (d) => {
+            datasets.forEach( (d) => {
                 if (d.hasOwnProperty('datasets')) {
                     keplergljson = {
                         datasets: [d],
-                        config: m.config
+                        config: this.map.config
                     }
                     processeddata = [KeplerGl.processKeplerglJSON(keplergljson).datasets[0].data]
                 } else if (d.hasOwnProperty('csvstring')) {
@@ -138,13 +151,13 @@ Vue.component("VueKeplerGl", {
 
                 // match id with old datasets
                 newDataset = processeddata.map((d2, i) => ({
-                version: m.config.version,
-                data: {
-                    id: d.id,
-                    label: d.id,
-                    allData: d2.rows,
-                    fields: d2.fields
-                }
+                    version: this.map.config.version,
+                    data: {
+                        id: d.id,
+                        label: d.id,
+                        allData: d2.rows,
+                        fields: d2.fields
+                    }
                 }));
 
                 newDatasets.push(newDataset[0]);
@@ -157,11 +170,11 @@ Vue.component("VueKeplerGl", {
         
             const loadedData = KeplerGl.KeplerGlSchema.load(
                 newDatasets,
-                m.config
+                this.map.config
             );
         
-            loadedData['options'] = {centerMap: m.window.center_map, readOnly: m.window.read_only};
-            store.dispatch(KeplerGl.addDataToMap(loadedData));
+            loadedData['options'] = {centerMap: this.map.window.center_map, readOnly: this.map.window.read_only};
+            this.store.dispatch(KeplerGl.addDataToMap(loadedData));
         }
     }
 });
