@@ -7,7 +7,7 @@ using Reexport
 
 export keplergl
 
-keplergl_assets_config = Genie.Assets.AssetsConfig(package = "KeplerGLBase.jl")
+keplergl_assets_config = Genie.Assets.AssetsConfig(package = isdefined(@__MODULE__, :KeplerGLBase) ? "KeplerGLBase.jl" : "KeplerGL")
 assets_config = Genie.Assets.AssetsConfig(package = "StippleKeplerGL.jl")
 
 const deps_routes = String[]
@@ -29,7 +29,7 @@ function keplergl(map::Union{Symbol,Nothing}, args...;
 end
 
 function __init__()
-    basedir = dirname(dirname(pathof(KeplerGLBase)))
+    basedir = dirname(dirname(pathof(isdefined(@__MODULE__, :KeplerGLBase) ? KeplerGLBase : KeplerGL)))
     for js in [
         "react.production.min.js", "react-dom.production.min.js",
         "redux.js", "react-redux.min.js",
