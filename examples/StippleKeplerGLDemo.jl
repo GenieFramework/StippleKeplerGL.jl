@@ -45,7 +45,7 @@ m2.window[:map_legend_show] = m2.window[:map_legend_active] = m2.window[:visible
 end
 
 @deps StippleKeplerGL
-Stipple.register_global_components("VueKeplerGl", legacy = true)
+isdefined(@__MODULE__, :register_global_components) && Stipple.register_global_components("VueKeplerGl", legacy = true)
 
 ui() = [
     column(class = "full-height", [
