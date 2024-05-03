@@ -1,11 +1,11 @@
 Vue.component("VueKeplerGl", {
-    template: '<div id="id1"></div>',
+    template: `<div :id="id" style="position: relative; width: 100%; height: 100%"></div>`,
     inheritAttrs: !1,
     props: {
         id: {
             type: String,
             required: !1,
-            default: 'kepler-gl'
+            default: 'keplergl-' + Math.random().toString().substring(2)
         },
         map: {
             type: Object
@@ -18,7 +18,7 @@ Vue.component("VueKeplerGl", {
         }
     },
     mounted() {
-        let d = this.setup_map(this.map)
+        let d = this.setup_map(this.map, this.id)
         this.app = d.app
         this.store = d.store
         this.load_data(this.map.datasets)
@@ -57,7 +57,7 @@ Vue.component("VueKeplerGl", {
                 }
             })
         },
-        setup_map(m) {
+        setup_map(m, id) {
             /* Validate Mapbox Token */
             MAPBOX_TOKEN = m.window.token
             console.log(MAPBOX_TOKEN)
@@ -114,7 +114,7 @@ Vue.component("VueKeplerGl", {
                                         mapboxApiAccessToken: mapboxToken,
                                         id: this.id,
                                         width: width,
-                                        height: height
+                                        height: height || '100%'
                                     }
                                 )
                             }
@@ -134,7 +134,7 @@ Vue.component("VueKeplerGl", {
 
             /** Render **/
             (function render(react, ReactDOM, app) {
-                ReactDOM.render(app, document.getElementById('id1'));
+                ReactDOM.render(app, document.getElementById(id));
             }(React, ReactDOM, app));
 
             return {app, store}
