@@ -2,7 +2,7 @@
 
 <h3></h3>
 
-<img width="600" alt="StippleKeplerGL Demo" src="docs/src/assets/StippleKepler.png">
+<img width="600" alt="StippleKeplerGL Demo" src="docs/src/assets/StippleKeplerGL.png">
 
 Julia package to integrate KeplerGL maps into Genie/Stipple applications.
 
