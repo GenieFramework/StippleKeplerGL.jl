@@ -3,7 +3,7 @@ module StippleKeplerGL
 using Stipple
 using Reexport
 
-@reexport using KeplerGL
+@reexport Stipple.@using_except KeplerGL: render
 
 export keplergl
 

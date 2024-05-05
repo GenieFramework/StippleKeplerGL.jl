@@ -18,82 +18,116 @@ Vue.component("VueKeplerGl", {
         }
     },
     mounted() {
-        let d = this.setup_map(this.map, this.id)
+        let d = this.setupMap(this.id)
         this.app = d.app
         this.store = d.store
-        this.load_data(this.map.datasets)
+        this.loadData(this.map.datasets)
     },
     watch: {
         'map.datasets': {
-            handler: function (m) {this.load_data(m)},
+            handler: function (m) {this.loadData(m)},
+            deep: true
+        },
+        'map.window': { 
+            handler: function (newWindow) {
+                // Update UI based on changes to map.window
+                // For example, update readOnly state
+                if (this.app) {
+                    this.store.dispatch({
+                        type: 'UPDATE_UI_STATE',
+                        payload: this.makeUIState()
+                    });
+                }
+            },
+            deep: true
+        },
+        'map.config': {
+            handler: function (newConfig) {
+                // Update UI based on changes to map.config
+                // For example, update visible layers or map legend
+                if (this.app) {
+                    this.loadData(this.map.datasets);
+                }
+            },
             deep: true
         }
     },
     methods: {
-        make_initial_state(m) {
-            return KeplerGl.keplerGlReducer.initialState({
-                uiState: {
-                    readOnly: m.window.read_only,
-                    activeSidePanel: null, 
-                    currentModal: null,
-                    mapControls: {
-                        visibleLayers: {
-                            show: m.window.visible_layers_show,
-                            active: m.window.visible_layers_active
-                        },
-                        mapLegend: {
-                            show: m.window.map_legend_show,
-                            active: m.window.map_legend_active
-                        },
-                        toggle3d: {
-                            show: m.window.toggle_3d_show,
-                            active: m.window.toggle_3d_active
-                        },
-                        splitMap: {
-                            show: m.window.split_map_show,
-                            active: m.window.split_map_active
-                        }
+        makeUIState() {
+            m = this.map
+            return {
+                readOnly: m.window.read_only,
+                activeSidePanel: null, 
+                currentModal: null,
+                mapControls: {
+                    visibleLayers: {
+                        show: m.window.visible_layers_show,
+                        active: m.window.visible_layers_active
+                    },
+                    mapLegend: {
+                        show: m.window.map_legend_show,
+                        active: m.window.map_legend_active
+                    },
+                    toggle3d: {
+                        show: m.window.toggle_3d_show,
+                        active: m.window.toggle_3d_active
+                    },
+                    splitMap: {
+                        show: m.window.split_map_show,
+                        active: m.window.split_map_active
                     }
                 }
-            })
+            }
         },
-        setup_map(m, id) {
+
+        setupMap(id) {
+            const m = this.map
             /* Validate Mapbox Token */
             MAPBOX_TOKEN = m.window.token
-            console.log(MAPBOX_TOKEN)
+            // console.log(MAPBOX_TOKEN)
             if ((MAPBOX_TOKEN || '') === '' || MAPBOX_TOKEN === 'PROVIDE_MAPBOX_TOKEN') {
-            alert(WARNING_MESSAGE);
+                alert(WARNING_MESSAGE);
             }
 
             /** STORE **/
-            state = this.make_initial_state(m)
-            const reducers = (function createReducers(Redux, KeplerGl) {
-                return Redux.combineReducers({
-                    // mount KeplerGl reducer
-                    keplerGl: state
-                });
-            }(Redux, KeplerGl));
+            const customReducer = KeplerGl.keplerGlReducer.initialState({
+                uiState: this.makeUIState()
+            })
+            const reducers = Redux.combineReducers({
+                // mount KeplerGl reducer
+                keplerGl: customReducer
+            });
 
-            const middleWares = (function createMiddlewares(KeplerGl) {
-                return KeplerGl.enhanceReduxMiddleware([
-                    // Add other middlewares here
-                ]);
-            }(KeplerGl));
+            const composedReducer = (state, action) => {
+                switch (action.type) {
+                    case 'UPDATE_UI_STATE':
+                        return {
+                            ...state,
+                            keplerGl: {
+                                ...state.keplerGl,
+                                map: {
+                                    ...state.keplerGl.map,
+                                    uiState: {...state.keplerGl.map.uiState, ...action.payload}
+                                }
+                            }
+                        }
+                }
+                return reducers(state, action)
+            };
 
-            const enhancers = (function createEnhancers(Redux, middles) {
-                return Redux.applyMiddleware(...middles);
-            }(Redux, middleWares));
+            const middleWares = KeplerGl.enhanceReduxMiddleware([
+                // Add other middlewares here
+            ]);
 
-            const store = (function createStore(Redux, enhancers) {
-            const initialState = {};
+            const enhancers = Redux.applyMiddleware(...middleWares);
 
-            return Redux.createStore(
-                reducers,
-                initialState,
+            const store = Redux.createStore(
+                composedReducer,
+                {},
                 Redux.compose(enhancers)
             );
-            }(Redux, enhancers));
-            // expose store globally:
+
+            // expose store globally for debugging purposes
             window.store = store;
             /** END STORE **/
 
@@ -107,7 +141,6 @@ Vue.component("VueKeplerGl", {
                             AutoSizer,
                             {},
                             function({height, width}) {
-                                console.log('height: ' + height + ' width: ' + width)
                                 return react.createElement(
                                     KeplerGl.KeplerGl,
                                     {
@@ -139,7 +172,7 @@ Vue.component("VueKeplerGl", {
 
             return {app, store}
         },
-        load_data(datasets) {
+        loadData(datasets) {
             const newDatasets = [];
             datasets.forEach( (d) => {
                 if (d.hasOwnProperty('datasets')) {
@@ -153,8 +186,6 @@ Vue.component("VueKeplerGl", {
                 } else  if (d.hasOwnProperty('json')) {
                     processeddata = [KeplerGl.processGeojson(d.json)]            
                 }
-
-                // for debugging
 
                 // match id with old datasets
                 newDataset = processeddata.map((d2, i) => ({
@@ -172,8 +203,6 @@ Vue.component("VueKeplerGl", {
                 // for debugging
                 // console.log(newDataset)
             })
-        
-            // const config = m.config
         
             const loadedData = KeplerGl.KeplerGlSchema.load(
                 newDatasets,
