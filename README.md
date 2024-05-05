@@ -29,10 +29,10 @@ using CSV
 using Colors
 using ColorBrewer
 
-keplergl_path = dirname(dirname(pathof(isdefined(@__MODULE__, :KeplerGLBase) ? KeplerGLBase : KeplerGL)))
-df = CSV.read("$keplergl_path/assets/example_data/data.csv", DataFrame)
+keplergl_path = Base.pkgdir(isdefined(@__MODULE__, :KeplerGLBase) ? KeplerGLBase : KeplerGL)
+df = CSV.read(joinpath(keplergl_path, "assets", "example_data", "data.csv"), DataFrame)
 
-token = "token please"   
+# token = "token please"
 
 m1 = KeplerGL.KeplerGLMap(token, center_map=false)
 
@@ -62,24 +62,78 @@ m2.config[:config][:mapState][:longitude]= -122.42806781055732
 m2.config[:config][:mapState][:zoom] = 4.886825331541375
 m2.window[:map_legend_show] = m2.window[:map_legend_active] = m2.window[:visible_layers_show] = m2.window[:visible_layers_active] = false
 
+d1, d2 = m1.datasets, m2.datasets
+
 @app begin
     @out map1 = m1
     @out map2 = m2
+    @in clear_data = false
+    @in restore_data = false
+    @in show_legend = false
+    @in go_west = false
+    @in go_east = false
+
+    @onbutton clear_data begin
+        __model__["map1.datasets"] = []
+        __model__["map2.datasets"] = []
+    end
+
+    @onbutton restore_data begin
+        __model__["map1.datasets"] = d1
+        __model__["map2.datasets"] = d2
+    end
+
+    @onbutton go_west begin
+        map1.config[:config][:mapState][:longitude] -= 1
+        __model__["map1.config.config.mapState.longitude"] = map1.config[:config][:mapState][:longitude]
+
+        map2.config[:config][:mapState][:longitude] -= 1
+        __model__["map2.config.config.mapState.longitude"] = map2.config[:config][:mapState][:longitude]
+    end
+
+    @onbutton go_east begin
+        map1.config[:config][:mapState][:longitude] += 1
+        __model__["map1.config.config.mapState.longitude"] = map1.config[:config][:mapState][:longitude]
+
+        map2.config[:config][:mapState][:longitude] += 1
+        __model__["map2.config.config.mapState.longitude"] = map2.config[:config][:mapState][:longitude]
+    end
+
+    @onchange show_legend begin
+        __model__["map1.window.map_legend_show"] = show_legend
+        __model__["map2.window.map_legend_show"] = show_legend
+
+        # alternatively, one could use the following lines to show the legend via the backend
+        # but this will transmit the full map data to the frontend
+
+        # map1.window[:map_legend_show] = show_legend
+        # notify(map1)
+    end
 end
 
 @deps StippleKeplerGL
-isdefined(@__MODULE__, :register_global_components) && Stipple.register_global_components("VueKeplerGl", legacy = true)
+isdefined(Stipple, :register_global_components) && Stipple.register_global_components("VueKeplerGl", legacy = true)
 
 ui() = [
     column(class = "full-height", [
-        h5(class = "col-auto q-pl-lg q-pt-md", "KeplerGL Demo", style = "padding-bottom: 0.5em")
+        row(col = :auto, class = "items-center", [
+            h5(class = "col-auto q-pl-lg q-py-md", "KeplerGL Demo")
+            cell()
+            btn(col = :auto, "", icon = "west", @click(:go_west), class = "q-mr-md", [tooltip("go west")])
+            btn(col = :auto, "", icon = "east", @click(:go_east), class = "q-mr-md", [tooltip("go east")])
+            btn(col = :auto, "", icon = "delete", @click(:clear_data), class = "q-mr-md", [tooltip("clear data")])
+            btn(col = :auto, "", icon = "restore_from_trash", @click(:restore_data), class = "q-mr-md", [tooltip("restore data")])
+            toggle(col = :auto, "legend", :show_legend, class = "q-mr-md")
+        ])
+        
         cell(keplergl(:map1, ref = "map1", id = "map1"))
         cell(keplergl(:map2, ref = "map2"))
     ])
 ]
 
 route("/") do
-    # global model
+    # uncomment next line for testing / debugging
+    global model
     model = @init
     page(class = "fixed-full", model, ui) |> html
 end
