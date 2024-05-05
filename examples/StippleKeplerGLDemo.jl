@@ -94,7 +94,7 @@ isdefined(Stipple, :register_global_components) && Stipple.register_global_compo
 ui() = [
     column(class = "full-height", [
         row(col = :auto, class = "items-center", [
-            h5(class = "col-5 q-pl-lg q-pt-md", "KeplerGL Demo", style = "padding-bottom: 0.5em")
+            h5(class = "col-auto q-pl-lg q-py-md", "KeplerGL Demo")
             cell()
             btn(col = :auto, "", icon = "west", @click(:go_west), class = "q-mr-md", [tooltip("go west")])
             btn(col = :auto, "", icon = "east", @click(:go_east), class = "q-mr-md", [tooltip("go east")])
@@ -102,6 +102,7 @@ ui() = [
             btn(col = :auto, "", icon = "restore_from_trash", @click(:restore_data), class = "q-mr-md", [tooltip("restore data")])
             toggle(col = :auto, "legend", :show_legend, class = "q-mr-md")
         ])
+        
         cell(keplergl(:map1, ref = "map1", id = "map1"))
         cell(keplergl(:map2, ref = "map2"))
     ])
