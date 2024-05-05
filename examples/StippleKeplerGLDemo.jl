@@ -47,26 +47,42 @@ d1, d2 = m1.datasets, m2.datasets
     @in clear_data = false
     @in restore_data = false
     @in show_legend = false
+    @in go_west = false
+    @in go_east = false
 
     @onbutton clear_data begin
-        map1.datasets = []
-        map2.datasets = []
-        notify(map1)
-        notify(map2)
+        __model__["map1.datasets"] = []
+        __model__["map2.datasets"] = []
     end
 
     @onbutton restore_data begin
-        map1.datasets = d1
-        map2.datasets = d2
-        notify(map1)
-        notify(map2)
+        __model__["map1.datasets"] = d1
+        __model__["map2.datasets"] = d2
+    end
+
+    @onbutton go_west begin
+        map1.config[:config][:mapState][:longitude] -= 1
+        __model__["map1.config.config.mapState.longitude"] = map1.config[:config][:mapState][:longitude]
+
+        map2.config[:config][:mapState][:longitude] -= 1
+        __model__["map2.config.config.mapState.longitude"] = map2.config[:config][:mapState][:longitude]
+    end
+
+    @onbutton go_east begin
+        map1.config[:config][:mapState][:longitude] += 1
+        __model__["map1.config.config.mapState.longitude"] = map1.config[:config][:mapState][:longitude]
+
+        map2.config[:config][:mapState][:longitude] += 1
+        __model__["map2.config.config.mapState.longitude"] = map2.config[:config][:mapState][:longitude]
     end
 
     @onchange show_legend begin
         __model__["map1.window.map_legend_show"] = show_legend
         __model__["map2.window.map_legend_show"] = show_legend
+
         # alternatively, one could use the following lines to show the legend via the backend
         # but this will transmit the full map data to the frontend
+
         # map1.window[:map_legend_show] = show_legend
         # notify(map1)
     end
@@ -77,11 +93,14 @@ isdefined(Stipple, :register_global_components) && Stipple.register_global_compo
 
 ui() = [
     column(class = "full-height", [
-        row(col = :auto, [
+        row(col = :auto, class = "items-center", [
             h5(class = "col-5 q-pl-lg q-pt-md", "KeplerGL Demo", style = "padding-bottom: 0.5em")
-            btn("Clear Data", @click(:clear_data), class = "col-2 q-mr-md")
-            btn("Restore Data", @click(:restore_data), class = "col-2 q-mr-md")
-            toggle("Show Legend", :show_legend, class = "col-2 q-mr-md")
+            cell()
+            btn(col = :auto, "", icon = "west", @click(:go_west), class = "q-mr-md", [tooltip("go west")])
+            btn(col = :auto, "", icon = "east", @click(:go_east), class = "q-mr-md", [tooltip("go east")])
+            btn(col = :auto, "", icon = "delete", @click(:clear_data), class = "q-mr-md", [tooltip("clear data")])
+            btn(col = :auto, "", icon = "restore_from_trash", @click(:restore_data), class = "q-mr-md", [tooltip("restore data")])
+            toggle(col = :auto, "legend", :show_legend, class = "q-mr-md")
         ])
         cell(keplergl(:map1, ref = "map1", id = "map1"))
         cell(keplergl(:map2, ref = "map2"))
@@ -89,7 +108,7 @@ ui() = [
 ]
 
 route("/") do
-    # global model for testing / debugging
+    # uncomment next line for testing / debugging
     global model
     model = @init
     page(class = "fixed-full", model, ui) |> html
