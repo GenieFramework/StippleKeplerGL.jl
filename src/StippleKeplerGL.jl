@@ -3,11 +3,11 @@ module StippleKeplerGL
 using Stipple
 using Reexport
 
-@reexport Stipple.@using_except KeplerGL: render
+@reexport using KeplerGLBase
 
 export keplergl
 
-keplergl_assets_config = Genie.Assets.AssetsConfig(package = isdefined(@__MODULE__, :KeplerGLBase) ? "KeplerGLBase.jl" : "KeplerGL")
+keplergl_assets_config = Genie.Assets.AssetsConfig(package = "KeplerGLBase.jl")
 assets_config = Genie.Assets.AssetsConfig(package = "StippleKeplerGL.jl")
 
 const deps_routes = String[]
