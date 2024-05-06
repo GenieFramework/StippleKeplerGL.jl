@@ -132,43 +132,37 @@ Vue.component("VueKeplerGl", {
             /** END STORE **/
 
             /** COMPONENTS **/
-            const KeplerElement = (function (react, KeplerGl, mapboxToken) {
-                return function(props) {
-                    return react.createElement(
-                        'div',
-                        {style: {position: 'relative', left: 0, width: '100%', height: '100%'}},
-                        react.createElement(
-                            AutoSizer,
-                            {},
-                            function({height, width}) {
-                                return react.createElement(
-                                    KeplerGl.KeplerGl,
-                                    {
-                                        mapboxApiAccessToken: mapboxToken,
-                                        id: this.id,
-                                        width: width,
-                                        height: height || '100%'
-                                    }
-                                )
-                            }
-                        )
+            const KeplerElement = function(props) {
+                return React.createElement(
+                    'div',
+                    {style: {position: 'relative', left: 0, width: '100%', height: '100%'}},
+                    React.createElement(
+                        AutoSizer,
+                        {},
+                        function({height, width}) {
+                            return React.createElement(
+                                KeplerGl.KeplerGl,
+                                {
+                                    mapboxApiAccessToken: MAPBOX_TOKEN,
+                                    id: this.id,
+                                    width: width,
+                                    height: height || '100%'
+                                }
+                            )
+                        }
                     )
-                }
-            }(React, KeplerGl, MAPBOX_TOKEN));
-
-            const app = (function createReactReduxProvider(react, ReactRedux, KeplerElement) {
-                return react.createElement(
-                    ReactRedux.Provider,
-                    {store},
-                    react.createElement(KeplerElement, null)
                 )
-            }(React, ReactRedux, KeplerElement));
+            }
+
+            const app = React.createElement(
+                ReactRedux.Provider,
+                {store},
+                React.createElement(KeplerElement, null)
+            )
             /** END COMPONENTS **/
 
             /** Render **/
-            (function render(react, ReactDOM, app) {
-                ReactDOM.render(app, document.getElementById(id));
-            }(React, ReactDOM, app));
+            ReactDOM.render(app, document.getElementById(id));
 
             return {app, store}
         },

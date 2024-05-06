@@ -11,9 +11,9 @@ df = CSV.read(joinpath(keplergl_path, "assets", "example_data", "data.csv"), Dat
 
 # token = "token please"
 
-m1 = KeplerGL.KeplerGLMap(token, center_map=false)
+m1 = KeplerGLMap(token, center_map=false)
 
-KeplerGL.add_point_layer!(m1, df, :Latitude, :Longitude,
+add_point_layer!(m1, df, :Latitude, :Longitude,
     color = colorant"rgb(23,184,190)", color_field = :Magnitude, color_scale = "quantize", 
     color_range = ColorBrewer.palette("PRGn", 6),
     radius_field = :Magnitude, radius_scale = "sqrt", radius_range = [4.2, 96.2], radius_fixed = false,
@@ -25,9 +25,9 @@ m1.config[:config][:mapState][:longitude]= -120.42806781055732
 m1.config[:config][:mapState][:zoom] = 4.886825331541375
 m1.window[:map_legend_show] = m1.window[:map_legend_active] = m1.window[:visible_layers_show] = m1.window[:visible_layers_active] = false
 
-m2 = KeplerGL.KeplerGLMap(token, center_map=false)
+m2 = KeplerGLMap(token, center_map=false)
 
-KeplerGL.add_point_layer!(m2, df, :Latitude, :Longitude,
+add_point_layer!(m2, df, :Latitude, :Longitude,
     color = colorant"rgb(23,184,190)", color_field = :Magnitude, color_scale = "quantize", 
     color_range = ColorBrewer.palette("RdYlGn", 6),
     radius_field = :Magnitude, radius_scale = "sqrt", radius_range = [4.2, 96.2], radius_fixed = false,
@@ -39,7 +39,7 @@ m2.config[:config][:mapState][:longitude]= -122.42806781055732
 m2.config[:config][:mapState][:zoom] = 4.886825331541375
 m2.window[:map_legend_show] = m2.window[:map_legend_active] = m2.window[:visible_layers_show] = m2.window[:visible_layers_active] = false
 
-d1, d2 = m1.datasets, m2.datasets
+d1, d2 = m1.datasets, m2.datasets;
 
 @app begin
     @out map1 = m1
