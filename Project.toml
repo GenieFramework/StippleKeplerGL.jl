@@ -1,7 +1,7 @@
 name = "StippleKeplerGL"
 uuid = "2b41e42f-53d9-436c-aed0-ebb7c31b58f1"
 authors = ["Helmut Hänsel <helmut.haensel@gmx.de>"]
-version = "0.1.1"
+version = "0.1.2"
 
 [deps]
 KeplerGLBase = "aea72984-0742-4639-bc0a-1d6e7e468236"
@@ -11,5 +11,5 @@ Stipple = "4acbeb90-81a0-11ea-1966-bdaff8155998"
 [compat]
 KeplerGLBase = "0.0.2"
 Reexport = "1"
-Stipple = "0.28, 0.29, 0.30"
+Stipple = "0.28, 0.29, 0.30, 0.31"
 julia = "1.6"
