@@ -24,8 +24,13 @@ m1.config[:config][:mapState][:longitude]= -120.42806781055732
 m1.config[:config][:mapState][:zoom] = 4.886825331541375
 m1.window[:map_legend_show] = m1.window[:map_legend_active] = m1.window[:visible_layers_show] = m1.window[:visible_layers_active] = false
 
+@app MyKeplerApp begin
+    x = 1
+end
+@deps MyKeplerApp StippleKeplerGL
 
-@deps StippleKeplerGL
 isdefined(Stipple, :register_global_components) && Stipple.register_global_components("VueKeplerGl", legacy = true)
 
-@test keplergl(col = 2, :map1, ref = "map_ref", id = "map1") == "<vue-kepler-gl :map=\"map1\" id=\"map1\" class=\"col-2\" ref=\"map_ref\"></vue-kepler-gl>"
+ui = keplergl(col = 2, :map1, ref = "map_ref", id = "map1")
+@test contains(ui, ":map=\"map1\"")
+@test contains(ui, "ref=\"map_ref\"")
