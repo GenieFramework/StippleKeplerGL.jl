@@ -1,7 +1,7 @@
 name = "StippleKeplerGL"
 uuid = "2b41e42f-53d9-436c-aed0-ebb7c31b58f1"
 authors = ["Helmut Hänsel <helmut.haensel@gmx.de>"]
-version = "0.1.2"
+version = "1.0.0"
 
 [deps]
 KeplerGLBase = "aea72984-0742-4639-bc0a-1d6e7e468236"
